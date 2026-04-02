@@ -7,6 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 
 const courseRoutes = require("./routes/courseRoutes");
 const enrollmentRoutes = require("./routes/enrollmentRoutes");
+const searchRoutes = require("./routes/searchRoutes"); 
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/courses", courseRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
+app.use("/api/search", searchRoutes);  
 
 // DB Connection
 mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/courseforge")
