@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const authRoutes = require("./routes/authRoutes");
 const courseRoutes = require("./routes/courseRoutes");
@@ -10,6 +12,37 @@ const searchRoutes = require("./routes/searchRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 
 const app = express();
+
+/* ================= SOCKET.IO SETUP ================= */
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Attach Socket.io
+const io = new Server(server, {
+  cors: {
+    origin: "*", // later replace with frontend URL
+    methods: ["GET", "POST"]
+  }
+});
+
+// Make io accessible in controllers
+app.set("io", io);
+
+// Socket connection
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  // Join room using userId
+  socket.on("join", (userId) => {
+    socket.join(userId);
+    console.log(`User joined room: ${userId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
 
 // Stripe webhook needs raw body
 app.use(
@@ -33,7 +66,10 @@ mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/courseforge
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
 
-//Start Server
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+/* ================= SERVER START ================= */
+
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
