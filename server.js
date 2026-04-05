@@ -34,7 +34,6 @@ app.set("io", io);
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  // Join room using userId
   socket.on("join", (userId) => {
     socket.join(userId);
     console.log(`User joined room: ${userId}`);
@@ -45,39 +44,32 @@ io.on("connection", (socket) => {
   });
 });
 
-// Stripe webhook needs raw body
+/* ================= MIDDLEWARE ================= */
+
+// Stripe webhook (RAW body must come BEFORE json)
 app.use(
   "/api/payments/webhook",
   express.raw({ type: "application/json" })
 );
 
-// Middleware
 app.use(express.json());
 app.use(cors());
+app.use(limiter);
 
-// Routes
+/* ================= ROUTES ================= */
+
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/payments", paymentRoutes);
 
-app.use(limiter);
+/* ================= DB CONNECTION ================= */
 
-// DB Connection
 mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/courseforge")
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
 
-<<<<<<< HEAD
-// Start server
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});  
-=======
 /* ================= SERVER START ================= */
 
 const PORT = process.env.PORT || 3000;
@@ -85,4 +77,3 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
->>>>>>> 8e5e3b195e92dfe0ec2aa6d3249e803713677d3b
