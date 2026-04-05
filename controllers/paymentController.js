@@ -6,8 +6,8 @@ const Order = require("../models/Order");
 const Coupon = require("../models/Coupon");
 const Enrollment = require("../models/Enrollment");
 
-const sendNotification = require("../utils/notify");
-sendNotification(req, userId, "Payment successful! You are enrolled.");
+const userId = paymentIntent.metadata.userId;
+sendNotification(userId, "Payment successful! You are enrolled.");
 
 function generateInvoice(order, course) {
   return {
