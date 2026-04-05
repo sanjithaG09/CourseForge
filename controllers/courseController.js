@@ -1,6 +1,24 @@
 const Course = require("../models/Course");
+const redis = require("../config/redis");
 
-// ─── CREATE COURSE ────────────────────────────────────────
+/* Helper to generate cache key */
+const generateCacheKey = (prefix, obj) => {
+  return `${prefix}:${JSON.stringify(obj)}`;
+};
+
+/* Helper to clear course caches */
+const clearCourseCache = async () => {
+  try {
+    const keys = await redis.keys("courses:*");
+    if (keys.length > 0) {
+      await redis.del(...keys); // ✅ FIXED
+    }
+  } catch (err) {
+    console.error("Cache clear error:", err);
+  }
+};
+
+/* ─── CREATE COURSE ──────────────────────────────────────── */
 exports.createCourse = async (req, res) => {
   try {
     const {
@@ -30,6 +48,8 @@ exports.createCourse = async (req, res) => {
       instructor: req.user.id
     });
 
+    await clearCourseCache(); // 🔥 clean usage
+
     res.status(201).json({ message: "Course created successfully", course });
 
   } catch (err) {
@@ -38,9 +58,17 @@ exports.createCourse = async (req, res) => {
   }
 };
 
-// ─── GET ALL COURSES ──────────────────────────────────────
+/* ─── GET ALL COURSES (WITH CACHE) ───────────────────────── */
 exports.getAllCourses = async (req, res) => {
   try {
+    const cacheKey = generateCacheKey("courses", req.query);
+
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log("Cache hit");
+      return res.json(JSON.parse(cached));
+    }
+
     const {
       search,
       category,
@@ -55,6 +83,7 @@ exports.getAllCourses = async (req, res) => {
 
     if (category) filter.category = category;
     if (level) filter.level = level;
+
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);
@@ -65,25 +94,27 @@ exports.getAllCourses = async (req, res) => {
       filter.$text = { $search: search };
     }
 
-    // ✅ Fixed page and limit conversion
     const skip = (Number(page) - 1) * Number(limit);
 
     const courses = await Course.find(filter)
       .populate("instructor", "name email")
       .skip(skip)
       .limit(Number(limit))
-      // ✅ Sort by relevance when searching, by date otherwise
       .sort(search ? { score: { $meta: "textScore" } } : { createdAt: -1 })
       .select(search ? { score: { $meta: "textScore" } } : {});
 
     const total = await Course.countDocuments(filter);
 
-    res.json({
+    const response = {
       courses,
       total,
       page: Number(page),
       totalPages: Math.ceil(total / Number(limit))
-    });
+    };
+
+    await redis.set(cacheKey, JSON.stringify(response), "EX", 60);
+
+    res.json(response);
 
   } catch (err) {
     console.error("GetAllCourses error:", err);
@@ -91,15 +122,25 @@ exports.getAllCourses = async (req, res) => {
   }
 };
 
-// ─── GET SINGLE COURSE ────────────────────────────────────
+/* ─── GET SINGLE COURSE (WITH CACHE) ─────────────────────── */
 exports.getCourseById = async (req, res) => {
   try {
+    const cacheKey = `course:${req.params.id}`;
+
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log("Cache hit (single course)");
+      return res.json(JSON.parse(cached));
+    }
+
     const course = await Course.findById(req.params.id)
       .populate("instructor", "name email");
 
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
+
+    await redis.set(cacheKey, JSON.stringify(course), "EX", 60);
 
     res.json(course);
 
@@ -109,7 +150,7 @@ exports.getCourseById = async (req, res) => {
   }
 };
 
-// ─── UPDATE COURSE ────────────────────────────────────────
+/* ─── UPDATE COURSE ──────────────────────────────────────── */
 exports.updateCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
@@ -122,7 +163,6 @@ exports.updateCourse = async (req, res) => {
       return res.status(403).json({ message: "Not authorized" });
     }
 
-    // ✅ Block sensitive fields from being updated manually
     delete req.body.instructor;
     delete req.body.isPublished;
     delete req.body.enrollmentCount;
@@ -133,6 +173,9 @@ exports.updateCourse = async (req, res) => {
       { new: true }
     );
 
+    await redis.del(`course:${req.params.id}`);
+    await clearCourseCache();
+
     res.json({ message: "Course updated", course: updated });
 
   } catch (err) {
@@ -141,7 +184,7 @@ exports.updateCourse = async (req, res) => {
   }
 };
 
-// ─── DELETE COURSE ────────────────────────────────────────
+/* ─── DELETE COURSE ──────────────────────────────────────── */
 exports.deleteCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
@@ -156,6 +199,9 @@ exports.deleteCourse = async (req, res) => {
 
     await Course.findByIdAndDelete(req.params.id);
 
+    await redis.del(`course:${req.params.id}`);
+    await clearCourseCache();
+
     res.json({ message: "Course deleted successfully" });
 
   } catch (err) {
@@ -164,7 +210,7 @@ exports.deleteCourse = async (req, res) => {
   }
 };
 
-// ─── PUBLISH COURSE ───────────────────────────────────────
+/* ─── PUBLISH COURSE ─────────────────────────────────────── */
 exports.publishCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
@@ -180,6 +226,9 @@ exports.publishCourse = async (req, res) => {
     course.isPublished = true;
     await course.save();
 
+    await redis.del(`course:${req.params.id}`);
+    await clearCourseCache();
+
     res.json({ message: "Course published successfully" });
 
   } catch (err) {
@@ -188,7 +237,7 @@ exports.publishCourse = async (req, res) => {
   }
 };
 
-// ─── GET MY COURSES ───────────────────────────────────────
+/* ─── GET MY COURSES ─────────────────────────────────────── */
 exports.getMyCourses = async (req, res) => {
   try {
     const courses = await Course.find({ instructor: req.user.id });
