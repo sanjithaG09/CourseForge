@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
+const limiter = require("./middleware/rateLimiter");
 
 const authRoutes = require("./routes/authRoutes");
 const courseRoutes = require("./routes/courseRoutes");
@@ -60,6 +61,8 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/payments", paymentRoutes);
+
+app.use(limiter);
 
 // DB Connection
 mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/courseforge")
