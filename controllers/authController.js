@@ -6,22 +6,12 @@ const blacklist = require("../middleware/blacklist");
 // ─── SIGNUP ───────────────────────────────────────────────
 exports.signup = async (req, res) => {
   try {
-<<<<<<< HEAD
     const { name, email, password, role } = req.body;
 
-=======
-    const { name, email, password } = req.body;
-
-    // Basic validation
->>>>>>> 010851147f287a3ef2d37a37485501bd299bd620
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-<<<<<<< HEAD
-=======
-    // Check if email already exists
->>>>>>> 010851147f287a3ef2d37a37485501bd299bd620
     const existing = await User.findOne({ email });
     if (existing) {
       return res.status(400).json({ message: "Email already registered" });
@@ -33,7 +23,6 @@ exports.signup = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-<<<<<<< HEAD
       role: role === "instructor" ? "instructor" : "student",
     });
 
@@ -45,12 +34,6 @@ exports.signup = async (req, res) => {
     );
 
     res.status(201).json({ token, role: user.role, name: user.name });
-=======
-      // ✅ FIX: No hardcoded role — defaults to "student" from schema
-    });
-
-    res.status(201).json({ message: "User registered successfully" });
->>>>>>> 010851147f287a3ef2d37a37485501bd299bd620
 
   } catch (err) {
     console.error("Signup error:", err);
@@ -118,7 +101,6 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
 // ─── UPDATE PROFILE (name only) ───────────────────────────
 exports.updateProfile = async (req, res) => {
   try {
@@ -132,18 +114,6 @@ exports.updateProfile = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.user.id,
       { name: name.trim() },
-=======
-// ─── UPDATE PROFILE ───────────────────────────────────────
-exports.updateProfile = async (req, res) => {
-  try {
-    // Prevent role from being changed via this route
-    delete req.body.role;
-    delete req.body.password;
-
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      req.body,
->>>>>>> 010851147f287a3ef2d37a37485501bd299bd620
       { new: true }
     ).select("-password");
 
@@ -155,7 +125,6 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
 // ─── CHANGE EMAIL ─────────────────────────────────────────
 exports.changeEmail = async (req, res) => {
   try {
@@ -199,8 +168,6 @@ exports.changeEmail = async (req, res) => {
   }
 };
 
-=======
->>>>>>> 010851147f287a3ef2d37a37485501bd299bd620
 // ─── CHANGE PASSWORD ──────────────────────────────────────
 exports.changePassword = async (req, res) => {
   try {
@@ -210,13 +177,10 @@ exports.changePassword = async (req, res) => {
       return res.status(400).json({ message: "Both passwords required" });
     }
 
-<<<<<<< HEAD
     if (newPassword.length < 6) {
       return res.status(400).json({ message: "New password must be at least 6 characters" });
     }
 
-=======
->>>>>>> 010851147f287a3ef2d37a37485501bd299bd620
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -234,8 +198,4 @@ exports.changePassword = async (req, res) => {
     console.error("ChangePassword error:", err);
     res.status(500).json({ message: "Error changing password" });
   }
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 010851147f287a3ef2d37a37485501bd299bd620
