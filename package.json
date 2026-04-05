@@ -1,17 +1,23 @@
 {
+  "name": "courseforge",
+  "version": "1.0.0",
+  "description": "CourseForge Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
-<<<<<<< HEAD
+    "bcryptjs": "^3.0.3",
     "bull": "^4.16.5",
     "bullmq": "^5.72.0",
-    "ioredis": "^5.10.1",
-    "socket.io": "^4.8.3",
-=======
->>>>>>> 010851147f287a3ef2d37a37485501bd299bd620
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.3.3"
+    "ioredis": "^5.3.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.2",
+    "socket.io": "^4.7.5",
+    "stripe": "^14.25.0",
+    "uuid": "^9.0.1"
   }
 }
