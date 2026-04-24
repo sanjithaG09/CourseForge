@@ -1,0 +1,91 @@
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  gap: 16px;
+}
+.dash-greeting { font-size: 14px; color: var(--text3); margin-bottom: 2px; }
+.dash-name { font-size: 32px; font-weight: 800; }
+.dash-sub { color: var(--text2); font-size: 15px; margin-top: 4px; }
+
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 36px;
+}
+@media (max-width: 600px) { .dash-stats { grid-template-columns: 1fr; } }
+
+.dash-section { margin-bottom: 36px; }
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.instr-course-card {
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.instr-course-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.icc-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.icc-title { font-size: 15px; font-weight: 700; line-height: 1.3; }
+.icc-desc {
+  font-size: 13px;
+  color: var(--text2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.icc-footer { display: flex; gap: 14px; flex-wrap: wrap; }
+.icc-stat { font-size: 12px; color: var(--text3); }
+
+.dash-enrollments { display: flex; flex-direction: column; gap: 12px; }
+.enroll-card {
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.enroll-card:hover { border-color: var(--accent); }
+.enroll-info { flex: 1; min-width: 0; }
+.enroll-title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.enroll-instructor { font-size: 13px; color: var(--text3); margin-top: 2px; }
+.enroll-progress-wrap { width: 200px; flex-shrink: 0; }
+.enroll-progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+
+.quick-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.ql-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.ql-card:hover { border-color: var(--accent); background: rgba(14,165,233,0.06); transform: translateY(-2px); }
+.ql-icon { font-size: 22px; }
+.ql-label { font-size: 13px; font-weight: 600; }
+
+@media (max-width: 640px) {
+  .enroll-card { flex-direction: column; }
+  .enroll-progress-wrap { width: 100%; }
+}

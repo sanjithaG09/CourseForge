@@ -1,0 +1,103 @@
+.cl-header { margin-bottom: 24px; }
+
+.cl-search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.cl-search-input-wrap {
+  flex: 1;
+  position: relative;
+}
+.cl-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--text3);
+  pointer-events: none;
+}
+.cl-search-input { padding-left: 42px !important; }
+
+.cl-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+/* Filters */
+.cl-filters {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  position: sticky;
+  top: calc(var(--nav-h) + 20px);
+}
+.cf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.cf-title { font-weight: 700; font-size: 15px; }
+.cf-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px; height: 20px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+.filter-group { margin-bottom: 20px; }
+.filter-label { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase;
+  letter-spacing: 0.07em; margin-bottom: 10px; }
+
+.filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1.5px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font-body);
+}
+.chip:hover { border-color: var(--accent); color: var(--accent2); }
+.chip.active { background: rgba(14,165,233,0.15); border-color: var(--accent); color: var(--accent2); }
+
+.price-inputs { display: flex; align-items: center; gap: 8px; }
+.price-inputs .input-field { padding: 8px 10px; font-size: 13px; }
+
+/* Grid */
+.cl-main {}
+.cl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.cl-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px 0;
+}
+.cl-page-info { font-size: 14px; color: var(--text2); }
+
+@media (max-width: 900px) {
+  .cl-body { grid-template-columns: 1fr; }
+  .cl-filters { position: static; }
+}
