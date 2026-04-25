@@ -41,7 +41,7 @@ export default function Landing() {
           </h1>
           <p className="land-hero-sub">
             Join thousands of learners on CourseForge — where expert-led courses meet
-            AI-powered recommendations and real-time progress tracking.
+            real-time progress tracking.
           </p>
           <div className="land-hero-cta">
             <button className="btn btn-primary btn-lg" onClick={() => navigate('/register')}>

@@ -29,8 +29,8 @@ function App() {
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || ''}>
     <BrowserRouter>
       <AuthProvider>
-        <SocketProvider>
-          <ToastProvider>
+        <ToastProvider>
+          <SocketProvider>
             <Routes>
               {/* Public auth routes */}
               <Route path="/login" element={<Login />} />
@@ -106,8 +106,8 @@ function App() {
               <Route path="/" element={<Navigate to="/courses" replace />} />
               <Route path="*" element={<Navigate to="/courses" replace />} />
             </Routes>
-          </ToastProvider>
-        </SocketProvider>
+          </SocketProvider>
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
     </GoogleOAuthProvider>

@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { useToast } from '../components/Toast';
 
 const SocketContext = createContext(null);
 
 export function SocketProvider({ children }) {
   const { token, user } = useAuth();
+  const toast = useToast();
   const socketRef = useRef(null);
   const [notifications, setNotifications] = useState([]);
   const [connected, setConnected] = useState(false);
@@ -28,10 +30,12 @@ export function SocketProvider({ children }) {
     socket.on('disconnect', () => setConnected(false));
 
     socket.on('notification', (data) => {
+      const id = Date.now();
       setNotifications((prev) => [
-        { id: Date.now(), ...data, read: false },
+        { id, ...data, read: false },
         ...prev.slice(0, 19),
       ]);
+      toast.info(data.message);
     });
 
     socket.on('course:updated', ({ course }) => {

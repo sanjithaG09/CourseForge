@@ -77,6 +77,8 @@ app.use(limiter);
 
 /* ================= ROUTES ================= */
 
+app.get("/", (req, res) => res.json({ status: "ok", service: "CourseForge API" }));
+
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/enrollments", enrollmentRoutes);

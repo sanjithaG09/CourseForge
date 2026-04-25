@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const ActivityLog = require('./models/ActivityLog');
+const startEngagementJobs = require('./jobs/engagementJobs');
 
 const app = express();
 app.use(express.json());
@@ -42,6 +43,7 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB Atlas');
+    startEngagementJobs();
     app.listen(process.env.PORT || 5005, () =>
       console.log('P6 Activity Logger running on port', process.env.PORT || 5005)
     );

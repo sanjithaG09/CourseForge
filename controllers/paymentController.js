@@ -3,6 +3,7 @@ const Course = require("../models/Course");
 const Order = require("../models/Order");
 const Enrollment = require("../models/Enrollment");
 const notify = require("../utils/notify");
+const logActivity = require("../utils/activityLogger");
 
 const UPI_VPA = process.env.UPI_VPA || "courseforge@ybl";
 const MERCHANT_NAME = process.env.MERCHANT_NAME || "CourseForge";
@@ -82,6 +83,7 @@ const confirmPayment = async (req, res) => {
       return res.status(500).json({ message: "Enrollment failed. Please contact support." });
     }
 
+    logActivity(userId, 'enroll', courseId);
     notify.sendNotification(userId.toString(), "Payment of Rs." + course.price + " confirmed! You are enrolled in " + course.title);
     if (course.instructor?._id) {
       notify.sendNotification(course.instructor._id.toString(), "Rs." + course.price + " received via UPI! Student enrolled in " + course.title);
