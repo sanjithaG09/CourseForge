@@ -73,6 +73,61 @@ CourseForge-qr/
 `frontend/src/pages/InstructorDashboard.js` powers the instructor content management experience.
 `frontend/src/pages/MyLearning.js` displays enrolled courses and module-level progress.
 
+## Database
+
+**MongoDB** is used as the primary database, connected via **Mongoose**. The connection is established in `server.js` using `MONGO_URI` from `.env`, with a fallback to a local instance at `mongodb://127.0.0.1:27017/courseforge`.
+
+### Collections and Schemas
+
+**User**
+Stores all registered accounts. The `role` field (`student`, `instructor`, `admin`) controls what each user can access. OTP fields (`signupOTP`, `signupOTPExpires`, `resetPasswordOTP`, `resetPasswordOTPExpires`) are stored directly on the user document and cleared after verification. Email is enforced unique and lowercased.
+
+**Course**
+Stores course content and metadata. Each course embeds an array of `modules` (sub-documents with title, video URL, duration, and order) so module data is retrieved in a single query alongside the course. The `instructor` field is a reference to the User collection. A compound text index on `title`, `description`, and `tags` powers the course search endpoint.
+
+**Enrollment**
+Tracks which student is enrolled in which course. Stores `completedModules` as an array of module ObjectIds, a `progress` percentage, `isCompleted` flag, and `lastAccessedAt` timestamp. A unique compound index on `(user, course)` prevents duplicate enrollments even under concurrent requests. A single-field index on `user` speeds up dashboard queries.
+
+**Order**
+Records payment transactions. Stores the `user`, `course`, `amount`, a `paymentId` (UTR or transaction reference entered by the user), an internal `upiRef`, and a `status` enum (`pending`, `completed`, `failed`). The backend always reads the amount from this collection — never from the client — before enrolling a student.
+
+**Review**
+One review per user per course, enforced by a unique compound index on `(user, course)`. Stores a `rating` (1–5) and a `comment` (max 1000 characters). A single-field index on `course` makes loading all reviews for a course page fast.
+
+**Wishlist**
+One entry per user per course, enforced by a unique compound index on `(user, course)`. A single-field index on `user` speeds up fetching a user's full wishlist.
+
+**ActivityLog**
+Append-only log of user actions (`view`, `enroll`, `complete_lesson`, `search`) with a `metadata` object for flexible extra data and a `timestamp`. Indexed on `userId` for fast per-user analytics queries.
+
+### Indexes Summary
+
+| Collection | Index | Purpose |
+|---|---|---|
+| User | `email` (unique) | Enforce unique accounts |
+| Course | `title, description, tags` (text) | Full-text course search |
+| Enrollment | `(user, course)` (unique) | Prevent duplicate enrollments |
+| Enrollment | `user` | Fast student dashboard queries |
+| Order | `(user, course)` | Payment lookup per student per course |
+| Review | `(user, course)` (unique) | One review per student per course |
+| Review | `course` | Fast review listing per course page |
+| Wishlist | `(user, course)` (unique) | Prevent duplicate wishlist entries |
+| Wishlist | `user` | Fast wishlist fetch per user |
+| ActivityLog | `userId` | Fast per-user analytics queries |
+
+### Relationships
+
+```
+User ──< Enrollment >── Course
+User ──< Order     >── Course
+User ──< Review    >── Course
+User ──< Wishlist  >── Course
+User ──< ActivityLog
+Course ──[ modules ]   (embedded sub-documents)
+```
+
+All cross-collection references use Mongoose `ObjectId` refs and are populated with `.populate()` where needed (for example, `course.instructor` is populated when returning course detail pages).
+
 ## Prerequisites
 
 - Node.js and npm
