@@ -73,6 +73,16 @@ CourseForge-qr/
 `frontend/src/pages/InstructorDashboard.js` powers the instructor content management experience.
 `frontend/src/pages/MyLearning.js` displays enrolled courses and module-level progress.
 
+## Engagement and Background Jobs
+
+CourseForge includes an engagement system that tracks user activity and uses background jobs to send automated reminders.
+
+The system records activities such as course views, enrollments, lesson completion, and searches. Scheduled jobs identify inactive students and instructors and queue reminder emails for them.
+
+Redis is used for job storage and BullMQ is used to manage and process the background jobs asynchronously. This keeps reminder processing separate from normal API requests and helps prevent background tasks from blocking the main application.
+
+The main implementation is located in `p6-intelligence/`.
+
 ## Database
 
 **MongoDB** is used as the primary database, connected via **Mongoose**. The connection is established in `server.js` using `MONGO_URI` from `.env`, with a fallback to a local instance at `mongodb://127.0.0.1:27017/courseforge`.
