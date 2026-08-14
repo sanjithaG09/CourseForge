@@ -297,3 +297,20 @@ For testing with `rzp_test_*` keys, use card `4111 1111 1111 1111` with any futu
 - Duplicate email registrations with a conflicting role are blocked at signup.
 - Payment amounts are always read from the database server-side — client-sent values are ignored.
 - MongoDB connection errors are logged without crashing the backend during local development.
+## Troubleshooting
+
+### MongoDB connection error
+
+Make sure MongoDB is running and that `MONGO_URI` in the `.env` file points to the correct database.
+
+### Email/OTP not working
+
+Check that `EMAIL_USER` and `EMAIL_PASS` are configured correctly in `.env`. For Gmail, use an App Password when required.
+
+### Redis connection error
+
+If Redis is enabled for background jobs, make sure the Redis server is running and that `REDIS_HOST` and `REDIS_PORT` match the Redis configuration.
+
+### Port already in use
+
+If the configured port is already being used by another process, stop that process or change the `PORT` value in `.env`.
